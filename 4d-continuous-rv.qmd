@@ -1,0 +1,209 @@
+```{r}
+#| echo: false
+#| message: false
+library(tidyverse)
+library(ggplot2)
+```
+
+
+# Probability Density Function (pdf)
+
+For a continuous random variable  $X$, the pdf is denoted by $f(x)$ and satisfies:
+
+1. $f(x)\geq0$ for all $x$,
+2. $\int_{-\infty}^{\infty} f(x) \, dx = 1$.
+
+```{r}
+# Example: f(x) = 2x for x in (0, 1)
+x <- seq(0, 1, by = 0.01)
+y <- 2*x
+plot(x, y, type = "l", lwd = 2, ylab = "Density", xlab = "x", main = "PDF of f(x)=2x in (0,1)")
+```
+## Probability over an interval
+
+The probability that X (random variable) falls within the interval [a,b] is found by taking the integral of the pdf from a to b. This tells us how likely it is that X will take in a value within this range. 
+$P(a \leq X \leq b) = \int_{a}^{b} f(x) \, dx$ 
+
+
+# Cumulative Distribution Function (CDF)
+
+The Cumulative Distribution Function, F(x),gives us the probability that the random variable X is less than or equal to x.
+
+The CDF of $X$ is given by $F(x) = \int_{-\infty}^{x} f(t) \, dt$.
+
+```{r}
+# Example: f(x) = 2x for x in (0, 1)
+y_cdf <- x^2
+plot(x, y_cdf, type = "l", lwd = 2, ylab = "Probability", xlab = "x", main = "CDF of f(x)=2x in (0,1)")
+```
+
+# Expected Value
+
+The expected value of $X$ is given by $E(X) = \int_{-\infty}^{\infty} x \cdot f(x) \, dx$.
+
+```{r}
+# Example: f(x) = 2x for x in (0, 1)
+mean_val <- integrate(function(x) x * 2*x, 0, 1)$value
+mean_val
+```
+
+# Variance
+
+The variance of $X$ is given by $\text{Var}(X) = E((X - E(X))^2) = \int_{-\infty}^{\infty} (x - E(X))^2 \cdot f(x) \, dx$.
+
+```{r}
+# Example: f(x) = 2x for x in (0, 1)
+var_val <- integrate(function(x) (x - mean_val)^2 * 2*x, 0, 1)$value
+var_val
+```
+
+What is the relationship between a CDF and a PDF?
+
+# Uniform Distribution
+
+The Uniform distribution is defined by its two parameters, $a$ and $b$, which are the minimum and maximum values, respectively. The pdf of a Uniform distribution is given by:
+
+$f(x) = \frac{1}{b-a} \, \text{ for } x \in [a, b]$
+
+```{r}
+# Example: Uniform distribution U(0,1)
+x <- seq(0, 1, by = 0.01)
+y <- dunif(x, min = 0, max = 1)
+plot(x, y, type = "l", lwd = 2, ylab = "Density", xlab = "x", main = "PDF of Uniform(0,1)")
+```
+
+```{r}
+# find the f(0.5)
+dunif(x = 0.5, min = 0, max = 1)
+```
+
+```{r}
+# find the F(0.5)
+punif(q = 0.5, min = 0, max = 1)
+```
+
+Example:
+
+Imagine a spinner with a continuous circular scale ranging from 0 to 1. 
+
+1. What is the probability that it landing on point 0.5?
+
+2. What is the probability that it landing on a value smaller than 0.5?
+
+# Exponential Distribution
+
+The Exponential distribution is defined by its rate parameter $\lambda$. The pdf of an Exponential distribution is given by:
+
+$f(x) = \lambda e^{-\lambda x} \, \text{ for } x \geq 0$
+
+```{r}
+# Example: Exponential distribution with lambda = 1
+x <- seq(0, 5, by = 0.01)
+y <- dexp(x, rate = 1)
+plot(x, y, type = "l", lwd = 2, ylab = "Density", xlab = "x", main = "PDF of Exponential(1)")
+```
+
+```{r}
+# find the f(2)
+dexp(x = 2, rate = 1)
+```
+
+```{r}
+# find the F(2)
+pexp(q = 2, rate = 1)
+```
+
+Example:
+
+Suppose a bus arrives at a certain bus stop every 20 minutes on average.
+
+1. What is the distribution of the time a person have to wait?
+
+2.Find the probability that a bus arrives within 10 minutes
+
+If a bus arrives at a certain bus stop every 20 minutes on average, then the rate parameter $\lambda$ is $1/20$ buses per minute.
+
+Now, if we want to find the probability that a bus arrives within 10 minutes, we can substitute these values into the cumulative distribution function (CDF) of the exponential distribution:
+
+$F(x;\lambda) = 1 - e^{-\lambda x}$
+
+Plugging the values, we get:
+
+$F(10; 0.05) = 1 - e^{-(0.05)(10)} = 1 - e^{-0.5} \approx 1 - 0.606 = 0.394$
+
+So, there is approximately a 39.4% chance that a bus will arrive within the next 10 minutes at this bus stop given the new average arrival time of 20 minutes.
+
+
+# Normal Distribution
+
+The Normal distribution is defined by its mean $\mu$ and standard deviation $\sigma$. The pdf of a Normal distribution is given by:
+
+$f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2 / (2\sigma^2)}$
+
+```{r}
+# Example: Normal distribution with mu = 0 and sigma = 1
+x <- seq(-5, 5, by = 0.01)
+y <- dnorm(x, mean = 0, sd = 1)
+plot(x, y, type = "l", lwd = 2, ylab = "Density", xlab = "x", main = "PDF of Normal(0,1)")
+```
+
+```{r}
+# find the f(2)
+dnorm(x = 3, mean = 0, sd = 1)
+```
+
+```{r}
+# find the F(2)
+pnorm(q = 3, mean = 0, sd = 1)
+```
+
+Example: 4.4 on page 160, 4.7 on page 161
+
+## Z-Scores
+Z- Scores are used to show how far a certain value is from the mean.
+$Z = \frac{X - \mu}{\sigma}$
+
+Example: Let X represent the heights of adult males and $X \sim N(70, 3^2)$.
+What is the Z-score of a male who is 76 inches tall? What does this tell us?
+
+
+```{r}
+mean_height <- 70  
+sd_height <- 3     
+
+heights <- seq(60, 80, by = 0.1)
+
+pdf_values <- dnorm(heights, mean = mean_height, sd = sd_height)
+
+height_data <- data.frame(heights, pdf_values)
+
+ggplot(height_data, aes(x = heights, y = pdf_values)) +
+  geom_line(linewidth = 1) +
+  labs(title = "Normal Distribution of Male Heights",
+       x = "Height (inches)",
+       y = "Probability Density") 
+```
+
+
+
+What is the percentile rank of a male who is 76 inches?
+```{r}
+pnorm(76,70,3)
+```
+
+
+What percentage of men are between the heights 65in and 75in?
+
+P(65<X<75)= P(X < 75)- P(X<65)
+```{r}
+pnorm(q=75, mean=70,sd=3)-pnorm(q=65,mean=70,sd=3)
+```
+
+
+If a male is in the 25th percentile, what is the males height?
+```{r}
+qnorm(.25, mean=70,sd=3)
+```
+
+
+

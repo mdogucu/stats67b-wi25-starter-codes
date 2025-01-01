@@ -1,0 +1,20 @@
+---
+title: "Summarize Data"
+author: "Mine Dogucu"
+---
+
+Start the lecture notes by running the code that is already provided. 
+
+```{r}
+#| message: false
+library(openintro)
+library(tidyverse)
+library(broom)
+library(tidyr)
+library(AmesHousing)
+
+data(babies)
+ames_raw <- janitor::clean_names(ames_raw)
+```
+
+In the rest of this document you can take notes as you listen to the lecture.

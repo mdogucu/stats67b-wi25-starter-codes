@@ -1,0 +1,118 @@
+```{r, echo=F, message=F}
+library(tidyverse)
+```
+
+
+# Writing and Testing Hypotheses
+
+## Research Question
+
+A research question is a clear, focused, concise, complex, and arguable question around which you center your research. For example:
+
+> "Does a new teaching mehthod improve student test scores compared to traditional methods?"
+
+## Hypotheses
+
+From the research question, we can derive two hypotheses:
+
+- Null Hypothesis ($H_0$): The new teaching method has no effect on student test scores.
+- Alternative Hypothesis ($H_1$ or $H_a$): The new teaching method improves student test scores.
+
+## Hypothesis Testing Procedure
+
+The procedure to test the above hypothesis could involve the following steps:
+
+1. **Set hypotheses**: Set null and alternative hypotheses.
+2. **Collection of data**: Collect test scores before and after implementing new teaching methods.
+3. **Statistical test**: Use an appropriate statistical test (like a t-test) to compare means.
+4. **Decision**: Reject $H_0$ if there is evidence to reject the null hypothesis, else fail to reject $H_0$.
+
+# P-value
+## How do we know when to reject or fail to reject the null hypothesis?
+
+In order to determine whether we will reject or fail to reject our null hypothesis, we can look at our p-value which helps us determine the significance of our results. So, if
+
+$p \leq \alpha$, we reject the null hypothesis.
+$p > \alpha$, we fail to reject the null hypothesis.
+
+$\alpha$ represents our significance level (threshold for deciding whether to reject the null hypothesis).
+
+
+# Central Limit Theorem
+
+The Central Limit Theorem (CLT) states that, given a sufficiently large sample size, the sampling distribution of the mean will be normally distributed regardless of the original distribution of the data.
+
+Important things to note:
+
+1. Samples must be independent of each other
+
+2. Identically Distributed: Samples should be drawn from the same population distribution
+
+## Example
+
+Here, we will demonstrate the CLT by simulating the roll of a die, and showing that the means of the rolls tend to a normal distribution.
+
+```{r clt-example, echo=TRUE}
+set.seed(123)
+dice_rolls <- replicate(10000, mean(sample(1:6, size = 30, replace = TRUE)))
+hist(dice_rolls, breaks = 30, main="Demonstration of CLT with Dice Rolls", xlab="Mean of 30 dice rolls")
+```
+
+# Confidence Interval for a Single Proportion
+
+A confidence interval for a single proportion estimates the proportion of a population that has a particular attribute.
+
+## Example
+
+Suppose we want to estimate the proportion of people who approve of a new policy. In a random sample of 100 people, 60 approved the policy.
+
+```{r ci-single-proportion, echo=TRUE}
+# Calculate the confidence interval
+n <- 100  # Sample size
+p <- 0.6  # Sample proportion
+
+# Confidence interval
+library(binom)
+binom.confint(n * p, n, conf.level = 0.95, methods="wilson")
+```
+
+# Hypothesis Testing for a Single Proportion
+
+To test a hypothesis about a single proportion, we use a significance test such as the z-test for proportions.
+
+## Example
+
+Testing if the true proportion of voters who support a candidate is different from 50% based on a sample of 100 voters where 58 voters expressed their support.
+
+```{r}
+# Hypothesis test variables from the previous chunk
+pi_0 <- 0.5  # Hypothesized proportion
+p_hat <- 0.58  # Observed proportion
+n <- 100  # Sample size
+SE <- sqrt(p_hat * (1 - p_hat) / n)
+
+# 95% Confidence Interval for the observed proportion
+alpha <- 0.05
+z_alpha <- qnorm(1 - alpha / 2)
+CI_lower <- p_hat - z_alpha * SE
+CI_upper <- p_hat + z_alpha * SE
+
+# Normal Distribution based on observed proportion and SE
+x <- seq(0.3, 0.7, length = 1000)
+y <- dnorm(x, mean = p_hat, sd = SE)
+
+# PDF
+plot(x, y, type = "l", lwd = 2, col = "blue", main = "Distribution of the Observed Proportion", xlab = "Proportion", ylab = "Density")
+abline(v = pi_0, col = "red", lwd = 2, lty = 2)
+
+# Confidence Interval
+abline(v = CI_lower, col = "green", lwd = 2, lty = 3)
+abline(v = CI_upper, col = "green", lwd = 2, lty = 3)
+
+# Adding legends
+legend("topleft", legend=c("PDF", "Observed Proportion", "95% CI Lower", "95% CI Upper"), 
+       col=c("blue", "red", "green", "green"), lty = c(1, 2, 3, 3), cex=0.8)
+
+
+```
+

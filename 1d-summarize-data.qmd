@@ -1,0 +1,206 @@
+---
+title: "Discussion 1 Introduction & Summarizing Data"
+author: "Stats 67 Teaching Team"
+format: html
+---
+
+# Load Packages
+
+```{r}
+library(datasets)
+library(tidyverse)
+```
+
+
+# About R
+
+Basic functions and language
+
+```{r}
+print('hello woRld')
+birth_years <- c(1996, 2001, 1999)
+print(birth_years)
+```
+
+# Dataframe in R
+
+```{r}
+data.frame(person = c('Jack', 'Allen', 'Lisa'), birth_years = birth_years)
+
+?data.frame
+```
+
+You could also check the use of a function or a package by searching in the help panel.
+
+# Tidyverse
+
+After function names do not leave any spaces.
+
+Before and after operators (e.g. <-, =) leave spaces.
+
+Put a space after a comma, not before.
+
+Object names are all lower case, with words separated by an underscore.
+
+
+# Markdown and Quarto
+
+word
+
+_word_
+
+__word__
+
+~~word~~
+
+If you need R variables in text, you can do this: the birth_years are:
+`r birth_years`
+
+# Load mtcars Dataset
+
+```{r}
+mtcars <- mtcars %>% 
+  mutate(am = as.factor(am))
+```
+
+# Dataset
+
+## Description given by the author
+
+```{r}
+?mtcars
+```
+
+# First Look
+
+Take a glimpse at the data.
+
+1.  How many rows and columns are there in the "mtcars" dataset?
+2.  Any categorical variables?
+3.  Any numeric variables?
+
+```{r}
+glimpse(mtcars)
+```
+
+# First and last few lines
+
+```{r}
+head(mtcars)
+```
+
+```{r}
+tail(mtcars)
+```
+
+
+# Summarizing Categorical Data
+
+## Count by Transmission Types (am)
+
+How many samples are there in each transmission type?
+
+```{r}
+count(mtcars, am)
+```
+
+## Bar plots
+
+### Bar plot with counts
+
+```{r}
+ggplot(mtcars) +
+  aes(x = am) +
+  geom_bar()
+```
+
+# Summarizing Numeric Data
+
+## A few basic statistics
+
+### Mean
+
+What is the meaning of "Mean"?
+
+```{r}
+summarize(mtcars, mean(mpg))
+```
+
+### Median
+
+What is the meaning of "Median"?
+
+```{r}
+summarize(mtcars, median(mpg))
+```
+
+### Quantiles
+
+The 3rd Quantile of mpg:
+
+```{r}
+summarize(mtcars, quantile(mpg, 0.75))
+```
+
+What about the 1st Quantile? What is the meaning of "Quantile"?
+
+### Standard Deviation and Variance
+
+What are the meanings of "Standard Deviation" and "Variance"?
+
+```{r}
+summarize(mtcars, sd(mpg))
+```
+
+```{r}
+summarize(mtcars, var(mpg))
+```
+
+## Histogram
+
+```{r}
+ggplot(mtcars, aes(x = mpg)) +
+  geom_histogram(bins = 8)
+```
+
+## Boxplot of Miles per Gallon (mpg)
+
+On the boxplot, where is the median? Q1 and Q3? Interquartile Range (IQR)? Whiskers?
+
+```{r}
+ggplot(mtcars,
+       aes(y = mpg)) + 
+  scale_x_discrete( ) +
+  geom_boxplot()
+```
+
+# Summarizing More Than One Variable
+
+## Boxplot of Miles per Gallon (mpg) by Transmission Types (am)
+
+How many variables are represented in this plot?
+
+Are they numeric or categorical?
+
+```{r}
+ggplot(mtcars, aes(x = am, y = mpg)) +
+  geom_boxplot()
+```
+
+## Scatterplot of Miles per Gallon (mpg) and Horse Power (hp)
+
+How many variables are represented in this plot?
+
+Are they numeric or categorical?
+
+```{r}
+ggplot(mtcars, aes(x = mpg,
+                 y = hp)) +
+  geom_point()
+```
+
+
+
+
+
+

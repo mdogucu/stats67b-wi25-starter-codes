@@ -1,0 +1,205 @@
+---
+title: "8d-single-mean-diff-mean"
+format: html
+editor: visual
+---
+
+# Inference for Single Mean
+
+## Confidence Interval
+
+We still follows the general form of CI: \[point estimate $\pm$ critical value $\times$ standard error\]
+
+For single mean, CI is: $[\bar x\pm t_{n-1}^*\times SE]$, where $SE=\frac{s}{\sqrt n}$
+
+Conditions to meet:
+
+1.  Independence
+
+2.  Normality: The sample size should be greater than 30.
+
+## Example
+
+Given the heights of 50 random students in UCI, construct a 95% confidence interval for the average student height in UCI, assuming that all the conditions are met.
+
+5.75, 6.22, 5.52, 5.55, 5.48, 4.72, 5.84, 5.38, 5.74, 6.20, 6.78, 5.74, 5.21, 5.55, 6.70, 4.73, 5.86, 5.38, 4.98, 5.17, 6.17, 5.62, 5.98, 5.62, 5.96, 6.18, 5.12, 5.92, 5.38, 4.78, 4.46, 5.50, 5.22, 5.38, 5.54, 5.06, 5.66, 5.50, 6.33, 4.68, 5.45, 6.69, 5.60, 4.90, 5.18, 5.46, 5.47, 5.43, 5.58, 5.71
+
+```{r}
+x <- c(5.75, 6.22, 5.52, 5.55, 5.48, 4.72, 5.84, 5.38, 
+       5.74, 6.20, 6.78, 5.74, 5.21, 5.55, 6.70, 4.73, 
+       5.86, 5.38, 4.98, 5.17, 6.17, 5.62, 5.98, 5.62, 
+       5.96, 6.18, 5.12, 5.92, 5.38, 4.78, 4.46, 5.50, 
+       5.22, 5.38, 5.54, 5.06, 5.66, 5.50, 6.33, 4.68, 
+       5.45, 6.69, 5.60, 4.90, 5.18, 5.46, 5.47, 5.43, 
+       5.58, 5.71)
+
+# sample size
+n <- 50
+# sample mean
+x_bar <- mean(x)
+# sample standard deviation
+s <- sd(x)
+# standard error
+se <- s / sqrt(n)
+# critical value
+cv <- qt(0.975, df = n-1)
+# lower bound
+x_bar - cv * se
+# upper bound
+x_bar + cv * se
+```
+
+We are 95% confident that the average student height in UCI is between 5.414 and 5.707 feet.
+
+## Hypothesis Testing
+
+### 1. Set hypotheses.
+
+$H_0:\mu=6$ vs. $H_A:\mu\neq 6$
+
+### 2. Identify Sampling Distribution of $H_0$.
+
+By assuming the null hypothesis is true, we have:
+
+$\bar x\sim approx\ N(mean=6, sd=\frac{s}{\sqrt n})$
+
+### 3. Calculate p-value.
+
+```{r}
+# t statistic
+t <- (x_bar - 6) / se
+t
+```
+
+```{r}
+# p-value
+pt(t, df = n-1) * 2
+```
+
+### 4. Make a Decision and a Conclusion.
+
+If the null hypothesis were true ($\mu=6$) then probability of observing a sample statistic that is at least as extreme as the one that we have observed ($\bar x=5.56$) would be very close to 0. We consider this to be an evidence against the null since p-value is much less than 0.05, even close to 0.
+
+## Exercise
+
+Exercise 7.7 on page 293 of [the book](https://www.openintro.org/go/?id=os4_for_screen_readers&referrer=/book/os/index.php).
+
+# Difference of Two Means
+
+## Hypothesis Testing:
+
+### Example:
+
+Prices of diamonds are determined by what is known as the 4 Cs: cut, clarity, color, and carat weight. The prices of diamonds go up as the carat weight increases, but the increase is not smooth. For example, the difference between the size of a 0.99 carat diamond and a 1 carat diamond is undetectable to the naked human eye, but the price of a 1 carat diamond tends to be much higher than the price of a 0.99 diamond. In this question we use two random samples of diamonds, 0.99 carats and 1 carat, each sample of size 23, and compare the average prices of the diamonds. In order to be able to compare equivalent units, we first divide the price for each diamond by 100 times its weight in carats. That is, for a 0.99 carat diamond, we divide the price by 99. For a 1 carat diamond, we divide the price by 100. The distributions and some sample statistics are shown below.
+
+|      | 0.99 carats | 1 carat |
+|:-----|------------:|--------:|
+| Mean |     \$44.51 | \$56.81 |
+| SD   |     \$13.32 | \$16.13 |
+| n    |          23 |      23 |
+
+We need to perform a hypothesis test to evaluate if the average prices differ between the two groups.
+
+## Hypotheses:
+
+**Null Hypothesis (**$H_0$): There is no difference in the average standardized prices of 0.99 and 1 carat diamonds.
+
+$H_0: \mu_.99 = \mu_1$
+
+**Alternative Hypothesis (**$H_A$): There is a difference in the average standardized prices of 0.99 and 1 carat diamonds.
+
+$H_A: \mu_.99 \neq \mu_1$
+
+## Checking Assumptions:
+
+Before we conduct the hypothesis test, we need to check some conditions for the t-test.
+
+**Independence:** Both samples are random and represent less than 10% of their respective populations. Also, we have no reason to think that the 0.99 carats are not independent of the 1 carat diamonds since they are both sampled randomly.
+
+**Normality**: The distributions are not extremely skewed, hence we can assume that the distribution of the average differences will be nearly normal as well.
+
+### Sample statistics for 0.99 carat and 1 carat diamonds:
+
+```{r}
+mean_099 <- 44.51
+sd_099 <- 13.32
+n_099 <- 23
+
+mean_1 <- 56.81
+sd_1 <- 16.13
+n_1 <- 23
+
+```
+
+### Difference in means:
+
+```{r}
+diff_means <- mean_099 - mean_1
+diff_means
+```
+
+### Standard error:
+
+```{r}
+se <- sqrt((sd_099^2 / n_099) + (sd_1^2 / n_1))
+se
+```
+
+### t-statistic:
+
+```{r}
+t_stat <- diff_means / se
+t_stat
+```
+
+### Degrees of freedom:
+
+```{r}
+df <- 23 - 1
+df
+```
+
+### Calculate p-value for two-tailed test:
+
+```{r}
+p_value <- 2 * (1 - pt(abs(t_stat), df))
+p_value
+```
+
+**Interpretation:** Since p-value \< 0.05, reject H0. The data provide convincing evidence that the average standardized price of 0.99 carats and 1 carat diamonds are different.
+
+## Confidence Intervals:
+
+### Difference in means:
+
+```{r}
+diff_means <- mean_099 - mean_1
+diff_means
+```
+
+### Standard error:
+
+```{r}
+SE <- sqrt((sd_099^2 / n_099) + (sd_1^2 / n_1))
+SE
+```
+
+### t critical value for 95% CI (degrees of freedom = 22):
+
+```{r}
+t_critical <- qt(0.975, df = 22)
+t_critical
+```
+
+### Confidence interval:
+
+```{r}
+CI_lower <- diff_means - t_critical * SE
+CI_upper <- diff_means + t_critical * SE
+
+
+CI_lower
+CI_upper
+```
+
+**Interpretation**: We are 95% confident that the average standardized price of a 0.99 carat diamond is \$3.27 to \$21.33 lower than the average standardized price of a 1 carat diamond.

@@ -1,0 +1,124 @@
+```{r, echo=F, message=F}
+library(tidyverse)
+```
+
+# Introduction
+
+Maximum Likelihood Estimation (MLE) is a method used in statistics for estimating the parameters of a statistical model. It is widely used due to its solid theoretical foundation and practical applicability.
+
+# Understanding Likelihood
+
+The concept of likelihood is central to MLE. Unlike probability, likelihood measures how plausible a particular parameter value is given a sample of data.
+
+
+# Steps of MLE
+
+## 1. Finding the Likelihood Function (L)
+
+The likelihood function is a function of the parameters given the data.
+
+## 1. Finding the Likelihood Function (L)
+
+The likelihood function for a normally distributed variable with known variance and unknown mean μ is given by:
+
+$$ L(\mu; x_1, ..., x_n) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x_i - \mu)^2}{2\sigma^2}} $$
+
+where $x_1, ..., x_n$ are the observed data points and $\sigma$ is the known standard deviation.
+
+## 2. Taking the Derivative of the Likelihood
+
+The derivative of the log-likelihood with respect to μ is:
+
+$$ \frac{d}{d\mu} \log L(\mu; x_1, ..., x_n) = \sum_{i=1}^{n} \frac{x_i - \mu}{\sigma^2} $$
+
+## 3. Setting the Derivative to Zero
+
+To find the maximum, we set the derivative equal to zero:
+
+$$ \sum_{i=1}^{n} \frac{x_i - \mu}{\sigma^2} = 0 $$
+
+Solving for μ gives:
+
+$$ \mu = \frac{\sum_{i=1}^{n} x_i}{n} $$
+
+## 4. Checking the Second Derivative
+
+The second derivative of the log-likelihood is:
+
+$$ \frac{d^2}{d\mu^2} \log L(\mu; x_1, ..., x_n) = -\frac{n}{\sigma^2} $$
+
+Since this is always negative, it confirms that we have a maximum.
+
+
+
+# Comprehensive Example
+
+### The Scenario:
+
+Suppose we have a dataset representing the number of emails received per day over 30 days. Suppose the emial we recieve each day follows a i.i.d poisson distribution. We want to estimate the average number of emails received per day using MLE.
+
+### The Data:
+
+Let's assume our dataset (number of emails per day) is as follows:
+
+\[ 3, 2, 4, 3, 1, 2, 3, 4, 2, 3, 3, 1, 4, 3, 2, 5, 2, 3, 4, 2, 3, 2, 2, 3, 4, 3, 2, 3, 3, 2 \]
+
+### Poisson Distribution:
+
+The probability mass function (PMF) of the Poisson distribution is given by:
+
+$P(X=k) = \frac{e^{-\lambda} \lambda^k}{k!}$
+
+where $\lambda$ is the rate parameter (average rate of occurrence), $k$ is the number of occurrences.
+
+
+
+### Steps of MLE:
+
+#### 1. Finding the Likelihood Function (L):
+
+The likelihood function for the Poisson distribution, given a sample $x_1, ..., x_n$, is:
+
+$L(\lambda; x_1, ..., x_n) = \prod_{i=1}^{n} \frac{e^{-\lambda} \lambda^{x_i}}{x_i!}$
+
+#### 2. Taking the Log of the Likelihood:
+
+It's easier to work with the log-likelihood, which is:
+
+$\log L(\lambda; x_1, ..., x_n) = \sum_{i=1}^{n} (-\lambda + x_i \log(\lambda) - \log(x_i!))$
+
+#### 3. Taking the Derivative of the Log-Likelihood:
+
+The derivative of the log-likelihood with respect to $\lambda$ is:
+
+$\frac{d}{d\lambda} \log L(\lambda; x_1, ..., x_n) = -n + \frac{\sum_{i=1}^{n} x_i}{\lambda}$
+
+#### 4. Setting the Derivative to Zero:
+
+To find the maximum, we set the derivative equal to zero and solve for $\lambda$:
+
+$-n + \frac{\sum_{i=1}^{n} x_i}{\lambda} = 0$
+
+Solving for $\lambda$ gives:
+
+$\lambda = \frac{\sum_{i=1}^{n} x_i}{n}$
+
+#### 5. Solution:
+
+Substituting our data into the formula for $\lambda$:
+
+$\lambda = \frac{3 + 2 + 4 + ... + 2}{30}$
+
+#### 6. Checking the Second Derivative:
+
+The second derivative of the log-likelihood is:
+
+$\frac{d^2}{d\lambda^2} \log L(\lambda; x_1, ..., x_n) = -\frac{\sum_{i=1}^{n} x_i}{\lambda^2}$
+
+Since this is always negative for positive values of ( $\lambda$ ), it confirms that we have a maximum.
+
+
+
+### Conclusion:
+
+By calculating $\lambda$, we have estimated the average number of emails received per day using MLE with a Poisson distribution model. This example provides a clear demonstration of how MLE is applied to estimate parameters of a distribution using real-world data.
