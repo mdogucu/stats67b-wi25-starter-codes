@@ -26,7 +26,8 @@ $P(X=5)=f(5)=0.3$
 
 $P(X=6)=f(6)=0.15$
 
-```{r, echo=F}
+```{r}
+#| echo: false
 x <- 1:6
 y <- c(0.2, 0.1, 0.15, 0.1, 0.3, 0.15)
 
@@ -65,7 +66,8 @@ _Exercise 2: If we were only given the completed cdf table, are we able to know 
 
 _Exercise 3: What are $F(0), F(2.5), F(10)$?_
 
-```{r, echo=F}
+```{r}
+#| echo: false
 x <- 1:6
 y <- cumsum(c(0.2, 0.1, 0.15, 0.1, 0.3, 0.15))
 xend <- c(2, 3, 4, 5, 6, 6)
@@ -126,6 +128,37 @@ $Var(aX+bY)=a^2\cdot Var(X)+b^2\cdot Var(Y)$ if $X$ and $Y$ are independent.
 
 # Discrete Distributions
 
+## R Coding for Probabilities
+
+### Probability Mass Functions (PMF)
+In R, we can use
+```{r}
+#| eval: false
+dbinom(x, size, prob)
+dpois(x, lambda)
+dgeom(x, prob)
+```
+to get the pmfs $P(X=x)$ of random variables following respectively binomial, Poisson, and geometric distributions.
+
+* The first argument is a value $x$ or a vector of values $(x_1, x_2,\ldots, x_n)$.
+* The rest arguments are the required parameters for the specification of the distribution.
+* It returns a probability $P(X=x)$ or a vector of probabilities $(P(X=x_1), P(X=x_2),\ldots, P(X=x_k))$.
+
+### Cumulative Distriution Functions (CDF)
+We can use
+```{r}
+#| eval: false
+pbinom(q, size, prob)
+ppois(q, lambda)
+pgeom(q, prob)
+```
+to get the cdfs $P(X\leq q)$ of random variables following respectively binomial, Poisson, and geometric distributions.
+
+* The first argument is a value $q$ or a vector of values $(q_1, q_2,\ldots, q_n)$.
+* The rest arguments are the required parameters for the specification of the distribution.
+* It returns a probability $P(X\leq q)$ or a vector of probabilities $(P(X\leq q_1), P(X\leq q_2),\ldots, P(X\leq q_k))$.
+
+
 ## Bernoulli Distribution
 
 The Bernoulli distribution represents the outcome (success/failure) of an event with success probability of $\pi$.
@@ -147,35 +180,37 @@ _Example: From a deck of 52 cards, randomly pick a card, let the event be that t
 
 ## Geometric Distribution
 
-The Geometric distribution represents the number of failures before the first success when running independent trials with success probability $p$.
+The Geometric distribution represents the number of failures before the first success when running independent trials with success probability $\pi$.
 
-$X\sim Geometric(p)$
+$X\sim Geometric(\pi)$
 
-pmf: $f(x)=(1-p)^xp\ ,x=0,1,2,...$
+pmf: $f(x)=(1-\pi)^x\pi\ ,x=0,1,2,...$
 
 $\mu=E(X)=\frac{1-\pi}{\pi}$
 
 $\sigma^2=Var(X)=\frac{1-\pi}{\pi^2}$
 
-```{r, echo=F, warning=F}
+```{r}
+#| echo: false
+#| warning: false
 # Parameters
-p_values <- c(0.1, 0.3, 0.5)  # Probability values
+pi_values <- c(0.1, 0.3, 0.5)  # Probability values
 x <- 0:10  # Range of x values (number of failures before the first success)
 
 # Create a data frame for ggplot
 data <- data.frame(
-  x = rep(x, times = length(p_values)),
-  p = unlist(lapply(p_values, function(p) dgeom(x, prob = p))),
-  prob = rep(p_values, each = length(x))
+  x = rep(x, times = length(pi_values)),
+  pi = unlist(lapply(pi_values, function(pi) dgeom(x, prob = pi))),
+  prob = rep(pi_values, each = length(x))
 )
 
 # Plot using ggplot2
-ggplot(data, aes(x = x, y = p, color = factor(prob), group = prob)) +
+ggplot(data, aes(x = x, y = pi, color = factor(prob), group = prob)) +
   geom_line(size=1) +             # Add lines
   geom_point(size=2) +            # Add points
   scale_color_manual(
     values = c("red", "blue", "green"),
-    name = "p"
+    name = expression(pi)
   ) + 
   scale_x_continuous(breaks=0:10) +
   labs(
@@ -188,7 +223,8 @@ ggplot(data, aes(x = x, y = p, color = factor(prob), group = prob)) +
 
 _Exercise: From a deck of 52 cards, randomly pick a card, if the suit of the card picked is not heart, then replace the card into the deck, shuffle the deck and pick a new card. Repeat the procedure until the first heart is picked. What is the probability that the number of trials before the last one equals to 3? What is the probability that the number of trials before the last one is smaller or equal to 3?_
 
-```{r, include=F}
+```{r}
+#| include: false
 # f(3)
 dgeom(x = 3, prob = 0.25)
 
@@ -218,17 +254,19 @@ $E(X)=n\pi$
 
 $Var(X)=n\pi(1-\pi)$
 
-```{r, echo=F, warning=F}
+```{r}
+#| echo: false
+#| warning: false
 # Binomial, fixed n=10
 n <- 10  # Number of trials
-p_values <- c(0.2, 0.5, 0.8)  # Probability of success
+pi_values <- c(0.2, 0.5, 0.8)  # Probability of success
 x <- 0:n  # Range of x values (number of successes)
 
 # Create a data frame for ggplot
 data <- data.frame(
-  x = rep(x, times = length(p_values)),
-  p = unlist(lapply(p_values, function(p) dbinom(x, size = n, prob = p))),
-  prob = rep(p_values, each = length(x))
+  x = rep(x, times = length(pi_values)),
+  p = unlist(lapply(pi_values, function(p) dbinom(x, size = n, prob = p))),
+  prob = rep(pi_values, each = length(x))
 )
 
 # Plot using ggplot2
@@ -237,7 +275,7 @@ ggplot(data, aes(x = x, y = p, color = factor(prob), group = prob)) +
   geom_point(size = 2) +            # Add points
   scale_color_manual(
     values = c("red", "blue", "green"),
-    name = "p"
+    name = expression(pi)
   ) + 
   scale_x_continuous(breaks = 0:n) +
   labs(
@@ -248,7 +286,9 @@ ggplot(data, aes(x = x, y = p, color = factor(prob), group = prob)) +
   theme_minimal(base_size = 16)     # Increase overall font size
 ```
 
-```{r, warning=F, echo=F}
+```{r}
+#| warning: false
+#| echo: false
 p <- 0.5  # Fixed probability of success
 n_values <- c(10, 20, 40)  # Different values for number of trials
 x_values <- lapply(n_values, function(n) 0:n)  # Range of x values for each n
@@ -269,7 +309,8 @@ ggplot(data, aes(x = x, y = p, color = n, group = n)) +
     name = "n"
   ) + 
   labs(
-    title = "PMF of Binomial Distribution, fixed p=0.5",
+    title = paste0("PMF of Binomial Distribution, fixed ", "π
+=0.5"),
     x = "Number of Successes (x)",
     y = "Probability"
   ) +
