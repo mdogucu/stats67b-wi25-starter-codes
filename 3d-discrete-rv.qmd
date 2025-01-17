@@ -1,4 +1,6 @@
-```{r, message=FALSE, warning=FALSE}
+```{r}
+#| message: false
+#| warning: false
 library(tidyverse)
 ```
 
