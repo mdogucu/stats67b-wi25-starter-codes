@@ -200,7 +200,8 @@ pnorm(q=75, mean=70,sd=3)-pnorm(q=65,mean=70,sd=3)
 ```
 
 
-If a male is in the 25th percentile, what is the males height?
+If a male is in the 25th percentile, what is the male's height?
+
 ```{r}
 qnorm(.25, mean=70,sd=3)
 ```
