@@ -1,4 +1,6 @@
-```{r, echo=F, message=F}
+```{r}
+#| echo: false
+#| message: false
 library(tidyverse)
 ```
 
