@@ -1,0 +1,199 @@
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(dplyr)
+library(ggplot2)
+library(broom)
+```
+
+
+# Inference for Difference of Two Means
+
+## Hypothesis Testing:
+
+### Example:
+
+Prices of diamonds are determined by what is known as the 4 Cs: cut, clarity, color, and carat weight. The prices of diamonds go up as the carat weight increases, but the increase is not smooth. For example, the difference between the size of a 0.99 carat diamond and a 1 carat diamond is undetectable to the naked human eye, but the price of a 1 carat diamond tends to be much higher than the price of a 0.99 diamond. In this question we use two random samples of diamonds, 0.99 carats and 1 carat, each sample of size 23, and compare the average prices of the diamonds. In order to be able to compare equivalent units, we first divide the price for each diamond by 100 times its weight in carats. That is, for a 0.99 carat diamond, we divide the price by 99. For a 1 carat diamond, we divide the price by 100. The distributions and some sample statistics are shown below.
+
+|      | 0.99 carats | 1 carat |
+|:-----|------------:|--------:|
+| Mean |     \$44.51 | \$56.81 |
+| SD   |     \$13.32 | \$16.13 |
+| n    |          23 |      23 |
+
+We need to perform a hypothesis test to evaluate if the average prices differ between the two groups.
+
+## Hypotheses:
+
+**Null Hypothesis (**$H_0$): There is no difference in the average standardized prices of 0.99 and 1 carat diamonds.
+
+$H_0: \mu_.99 = \mu_1$
+
+**Alternative Hypothesis (**$H_A$): There is a difference in the average standardized prices of 0.99 and 1 carat diamonds.
+
+$H_A: \mu_.99 \neq \mu_1$
+
+## Checking Assumptions:
+
+Before we conduct the hypothesis test, we need to check some conditions for the t-test.
+
+**Independence:** Both samples are random and represent less than 10% of their respective populations. Also, we have no reason to think that the 0.99 carats are not independent of the 1 carat diamonds since they are both sampled randomly.
+
+**Normality**: The distributions are not extremely skewed, hence we can assume that the distribution of the average differences will be nearly normal as well.
+
+### Sample statistics for 0.99 carat and 1 carat diamonds:
+
+```{r}
+mean_099 <- 44.51
+sd_099 <- 13.32
+n_099 <- 23
+
+mean_1 <- 56.81
+sd_1 <- 16.13
+n_1 <- 23
+
+```
+
+### Difference in means:
+
+```{r}
+diff_means <- mean_099 - mean_1
+diff_means
+```
+
+### Standard error:
+
+```{r}
+se <- sqrt((sd_099^2 / n_099) + (sd_1^2 / n_1))
+se
+```
+
+### t-statistic:
+
+```{r}
+t_stat <- diff_means / se
+t_stat
+```
+
+### Degrees of freedom:
+
+```{r}
+df <- 23 - 1
+df
+```
+
+### Calculate p-value for two-tailed test:
+
+```{r}
+p_value <- 2 * (1 - pt(abs(t_stat), df))
+p_value
+```
+
+**Interpretation:** Since p-value \< 0.05, reject H0. The data provide convincing evidence that the average standardized price of 0.99 carats and 1 carat diamonds are different.
+
+## Confidence Intervals:
+
+### Difference in means:
+
+```{r}
+diff_means <- mean_099 - mean_1
+diff_means
+```
+
+### Standard error:
+
+```{r}
+SE <- sqrt((sd_099^2 / n_099) + (sd_1^2 / n_1))
+SE
+```
+
+### t critical value for 95% CI (degrees of freedom = 22):
+
+```{r}
+t_critical <- qt(0.975, df = 22)
+t_critical
+```
+
+### Confidence interval:
+
+```{r}
+CI_lower <- diff_means - t_critical * SE
+CI_upper <- diff_means + t_critical * SE
+
+
+CI_lower
+CI_upper
+```
+
+**Interpretation**: We are 95% confident that the average standardized price of a 0.99 carat diamond is \$3.27 to \$21.33 lower than the average standardized price of a 1 carat diamond.
+
+
+# Simple Linear Regression
+## Dataset
+The dataset **faithful** describes the waiting time between eruptions _(waiting)_ and the duration of the eruption _(eruptions)_ for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA. Both time are in minutes.
+
+```{r}
+glimpse(faithful)
+```
+
+## Linear Regression Setup
+We would like to explore the linear relationship between the duration of the eruption (response variable) and the waiting time between eruptions (explanatory variable).
+
+_Write out the linear equation between response variable and explanatory variable._
+
+## Check the Conditions of Least Squares Regression
+### Linearity
+```{r}
+ggplot(faithful, aes(x = waiting, y = eruptions)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE)
+```
+
+### Constant Variance
+```{r}
+lm_model <- lm(eruptions ~ waiting, data = faithful)
+plot(x = lm_model$fitted.values, y = lm_model$residuals, xlab = 'Fitted Values',
+     ylab = 'Residuals', main = 'Plot of Residuals vs. Fits')
+abline(h = 0, col = 'red')
+```
+
+### Normality of Residuals
+```{r}
+density_value <- density(lm_model$residuals)
+plot(density_value, main = 'Density of Residuals')
+
+# qqnorm(lm_model$residuals, main = 'QQ-Plot')
+# qqline(lm_model$residuals, col='red')
+```
+
+### Independence
+_What about the independence of the observations?_
+
+## Interpretation of Results
+```{r}
+broom::tidy(lm_model)
+```
+
+_What are the point estimates for slope and intercept? How to interpret them?_
+
+_What is the estimated eruption duration when the waiting time is 60 minutes? What is the estimated eruption duration when the waiting time is 120 minutes?_
+
+## Inference
+_Perform the hypothesis testing on whether the linear relationship between the duration of the eruption and waiting time between eruptions exists._
+
+_Do we have significant evidence that the waiting time between eruptions affects the duration of the eruption?_
+
+_Find the $95\%$ confidence interval for the slope. How to interpret this interval?_
+
+```{r}
+lm_summary <- summary(lm_model)
+est = lm_model$coefficients['waiting']
+me <- qt(0.975, df = 271) * lm_summary$coefficients['waiting', 'Std. Error']
+
+c(est - me, est + me)
+```
+```{r}
+confint(lm_model)[2, ]
+```
