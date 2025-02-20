@@ -142,8 +142,86 @@ abline(v = -point_estimate, lwd = 2, lty = 1)
 
 If the null hypothesis were true, then the probability of observing a difference of proportions in the sample that is at least extreme as -.13 would be 0.1712, and this is relatively high ( higher than 0.05). Therefore, the observed value ( $p_1-p_2=-.13$ ) is not significantly different from 0. We fail to reject the null and conclude that we have not found any evidence against the null.
 
-Questions: What if the p-value is 0.049? What if the p-value is 0.000001?
 
-## Exercise
+# Inference for Single Mean
+
+## Confidence Interval
+
+We still follows the general form of CI: \[point estimate $\pm$ critical value $\times$ standard error\]
+
+For single mean, CI is: $[\bar x\pm t_{n-1}^*\times SE]$, where $SE=\frac{s}{\sqrt n}$
+
+Conditions to meet:
+
+1.  Independence
+
+2.  Normality: The sample size should be greater than 30.
+
+## Example
+
+Given the heights of 50 random students in UCI, construct a 95% confidence interval for the average student height in UCI, assuming that all the conditions are met.
+
+5.75, 6.22, 5.52, 5.55, 5.48, 4.72, 5.84, 5.38, 5.74, 6.20, 6.78, 5.74, 5.21, 5.55, 6.70, 4.73, 5.86, 5.38, 4.98, 5.17, 6.17, 5.62, 5.98, 5.62, 5.96, 6.18, 5.12, 5.92, 5.38, 4.78, 4.46, 5.50, 5.22, 5.38, 5.54, 5.06, 5.66, 5.50, 6.33, 4.68, 5.45, 6.69, 5.60, 4.90, 5.18, 5.46, 5.47, 5.43, 5.58, 5.71
+
+```{r}
+x <- c(5.75, 6.22, 5.52, 5.55, 5.48, 4.72, 5.84, 5.38, 
+       5.74, 6.20, 6.78, 5.74, 5.21, 5.55, 6.70, 4.73, 
+       5.86, 5.38, 4.98, 5.17, 6.17, 5.62, 5.98, 5.62, 
+       5.96, 6.18, 5.12, 5.92, 5.38, 4.78, 4.46, 5.50, 
+       5.22, 5.38, 5.54, 5.06, 5.66, 5.50, 6.33, 4.68, 
+       5.45, 6.69, 5.60, 4.90, 5.18, 5.46, 5.47, 5.43, 
+       5.58, 5.71)
+
+# sample size
+n <- 50
+# sample mean
+x_bar <- mean(x)
+# sample standard deviation
+s <- sd(x)
+# standard error
+se <- s / sqrt(n)
+# critical value
+cv <- qt(0.975, df = n-1)
+# lower bound
+x_bar - cv * se
+# upper bound
+x_bar + cv * se
+```
+
+We are 95% confident that the average student height in UCI is between 5.414 and 5.707 feet.
+
+## Hypothesis Testing
+
+### 1. Set hypotheses.
+
+$H_0:\mu=6$ vs. $H_A:\mu\neq 6$
+
+### 2. Identify Sampling Distribution of $H_0$.
+
+By assuming the null hypothesis is true, we have:
+
+$\bar x\sim approx\ N(mean=6, sd=\frac{s}{\sqrt n})$
+
+### 3. Calculate p-value.
+
+```{r}
+# t statistic
+t <- (x_bar - 6) / se
+t
+```
+
+```{r}
+# p-value
+pt(t, df = n-1) * 2
+```
+
+### 4. Make a Decision and a Conclusion.
+
+If the null hypothesis were true ($\mu=6$) then probability of observing a sample statistic that is at least as extreme as the one that we have observed ($\bar x=5.56$) would be very close to 0. We consider this to be an evidence against the null since p-value is much less than 0.05, even close to 0.
+
+
+# Exercise (If time allows)
 
 Exercise 6.22 and 6.24 on page 254 of [the book](https://www.openintro.org/go/?id=os4_for_screen_readers&referrer=/book/os/index.php).
+
+Exercise 7.7 on page 293 of [the book](https://www.openintro.org/go/?id=os4_for_screen_readers&referrer=/book/os/index.php).
