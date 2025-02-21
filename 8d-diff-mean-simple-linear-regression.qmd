@@ -13,7 +13,7 @@ library(broom)
 
 ## Hypothesis Testing:
 
-### Example:
+**Example:**
 
 Prices of diamonds are determined by what is known as the 4 Cs: cut, clarity, color, and carat weight. The prices of diamonds go up as the carat weight increases, but the increase is not smooth. For example, the difference between the size of a 0.99 carat diamond and a 1 carat diamond is undetectable to the naked human eye, but the price of a 1 carat diamond tends to be much higher than the price of a 0.99 diamond. In this question we use two random samples of diamonds, 0.99 carats and 1 carat, each sample of size 23, and compare the average prices of the diamonds. In order to be able to compare equivalent units, we first divide the price for each diamond by 100 times its weight in carats. That is, for a 0.99 carat diamond, we divide the price by 99. For a 1 carat diamond, we divide the price by 100. The distributions and some sample statistics are shown below.
 
@@ -25,7 +25,7 @@ Prices of diamonds are determined by what is known as the 4 Cs: cut, clarity, co
 
 We need to perform a hypothesis test to evaluate if the average prices differ between the two groups.
 
-## Hypotheses:
+### Hypotheses:
 
 **Null Hypothesis (**$H_0$): There is no difference in the average standardized prices of 0.99 and 1 carat diamonds.
 
@@ -42,6 +42,8 @@ Before we conduct the hypothesis test, we need to check some conditions for the 
 **Independence:** Both samples are random and represent less than 10% of their respective populations. Also, we have no reason to think that the 0.99 carats are not independent of the 1 carat diamonds since they are both sampled randomly.
 
 **Normality**: The distributions are not extremely skewed, hence we can assume that the distribution of the average differences will be nearly normal as well.
+
+## Calculations
 
 ### Sample statistics for 0.99 carat and 1 carat diamonds:
 
@@ -105,8 +107,8 @@ diff_means
 ### Standard error:
 
 ```{r}
-SE <- sqrt((sd_099^2 / n_099) + (sd_1^2 / n_1))
-SE
+se <- sqrt((sd_099^2 / n_099) + (sd_1^2 / n_1))
+se
 ```
 
 ### t critical value for 95% CI (degrees of freedom = 22):
@@ -119,19 +121,21 @@ t_critical
 ### Confidence interval:
 
 ```{r}
-CI_lower <- diff_means - t_critical * SE
-CI_upper <- diff_means + t_critical * SE
+ci_lower <- diff_means - t_critical * se
+ci_upper <- diff_means + t_critical * se
 
 
-CI_lower
-CI_upper
+ci_lower
+ci_upper
 ```
 
 **Interpretation**: We are 95% confident that the average standardized price of a 0.99 carat diamond is \$3.27 to \$21.33 lower than the average standardized price of a 1 carat diamond.
 
 
 # Simple Linear Regression
+
 ## Dataset
+
 The dataset **faithful** describes the waiting time between eruptions _(waiting)_ and the duration of the eruption _(eruptions)_ for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA. Both time are in minutes.
 
 ```{r}
@@ -139,12 +143,27 @@ glimpse(faithful)
 ```
 
 ## Linear Regression Setup
+
 We would like to explore the linear relationship between the duration of the eruption (response variable) and the waiting time between eruptions (explanatory variable).
 
 _Write out the linear equation between response variable and explanatory variable._
 
 ## Check the Conditions of Least Squares Regression
+
+
+```{r}
+lm_model <- lm(eruptions ~ waiting, data = faithful)
+
+# The following lines stores residuals and predictions (y_hat) in the faithful data frame
+faithful <- faithful |>
+  modelr::add_residuals(lm_model) |> 
+  modelr::add_predictions(lm_model)
+
+glimpse(faithful)
+```
+
 ### Linearity
+
 ```{r}
 ggplot(faithful, aes(x = waiting, y = eruptions)) +
   geom_point() +
@@ -152,48 +171,64 @@ ggplot(faithful, aes(x = waiting, y = eruptions)) +
 ```
 
 ### Constant Variance
+
 ```{r}
-lm_model <- lm(eruptions ~ waiting, data = faithful)
-plot(x = lm_model$fitted.values, y = lm_model$residuals, xlab = 'Fitted Values',
-     ylab = 'Residuals', main = 'Plot of Residuals vs. Fits')
-abline(h = 0, col = 'red')
+faithful |> 
+  ggplot(aes(x = waiting, y = resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0)
 ```
 
-### Normality of Residuals
-```{r}
-density_value <- density(lm_model$residuals)
-plot(density_value, main = 'Density of Residuals')
 
-# qqnorm(lm_model$residuals, main = 'QQ-Plot')
-# qqline(lm_model$residuals, col='red')
+
+### Normality of Residuals
+
+```{r}
+faithful |> 
+  ggplot(aes(x = resid)) +
+  geom_density()
 ```
 
 ### Independence
+
 _What about the independence of the observations?_
 
-## Interpretation of Results
+### Interpretation of Results
+
 ```{r}
-broom::tidy(lm_model)
+lm_model_summary <- broom::tidy(lm_model)
+lm_model_summary
 ```
 
 _What are the point estimates for slope and intercept? How to interpret them?_
 
+$b_0$ = ?
+$b_1$ = ?
+
 _What is the estimated eruption duration when the waiting time is 60 minutes? What is the estimated eruption duration when the waiting time is 120 minutes?_
 
-## Inference
+### Inference
+
 _Perform the hypothesis testing on whether the linear relationship between the duration of the eruption and waiting time between eruptions exists._
 
 _Do we have significant evidence that the waiting time between eruptions affects the duration of the eruption?_
 
 _Find the $95\%$ confidence interval for the slope. How to interpret this interval?_
 
-```{r}
-lm_summary <- summary(lm_model)
-est = lm_model$coefficients['waiting']
-me <- qt(0.975, df = 271) * lm_summary$coefficients['waiting', 'Std. Error']
 
-c(est - me, est + me)
-```
+
 ```{r}
-confint(lm_model)[2, ]
+b1 <- as.numeric(lm_model_summary[2,2]) # This gets the second row and second column of the lm_model_summary table
+
+# b0 <- as.numeric(lm_model_summary[1, 2]) # you can also use this if needed
+
+critical_val <- qt(0.975, df = 271) 
+se_b1 <- as.numeric(lm_model_summary[2,3])
+
+me <- critical_val * se_b1
+c(b1 - me, b1 + me)
+```
+
+```{r}
+confint(lm_model)
 ```
