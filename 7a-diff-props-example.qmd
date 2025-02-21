@@ -1,0 +1,103 @@
+---
+title: "Solution to Exercise 6.28"
+format: html
+---
+
+## Hypotheses
+
+$$H_0: \pi_v = \pi_{nv}$$
+$$H_a: \pi_v \neq \pi_{nv}$$
+OR
+
+$$H_0: \pi_v - \pi_{nv} = 0$$
+$$H_a: \pi_v - \pi_{nv} \neq 0$$
+
+FAQ: does the order matter? 
+
+Does it matter to do $\pi_v - \pi_{nv}$ vs. $\pi_{nv} - \pi_v$?
+
+## Information given
+
+```{r}
+p_v <- 143/(143+159)
+p_v
+p_nv <- 111/(111+70)
+p_nv
+n1 <- 302
+n2 <- 181
+```
+
+## Calculations
+
+Point estimate:
+
+```{r}
+p_v - p_nv
+```
+
+Pooled proportion:
+
+```{r}
+p_pooled <- (111+143)/(181+302)
+```
+
+```{r}
+se <- sqrt((p_pooled*(1-p_pooled)/n1) + (p_pooled*(1-p_pooled)/n2))
+se
+```
+
+## Checking conditions
+
+**Independence**: The sample is random, and we can safely assume that 181 < 10% of all
+mothers of who don't take prenatal vitamins and 302 < 10% of all mothers who take prenatal vitamins. We can assume independence within each of these groups. Considering a mother either takes prenatal vitamins or not, we can also assume independence between these groups.
+
+**Success-failure**
+
+```{r}
+181*p_pooled
+181*(1-p_pooled)
+302*p_pooled
+302*(1-p_pooled)
+```
+
+All these values are greater than 10 and thus success-failure condition has also been met.
+
+## Calculating p value
+
+```{r}
+p_value <- pnorm(p_v - p_nv, 0, se)*2
+
+p_value
+```
+
+Since the p-value of `r p_value` is less than 0.05 we reject the null hypothesis and conclude that there is a significant difference in autism rate of children born to mothers who take prenatal vitamins and those who do not. Considering that the point estimate is negative, we can conclude that the rate of autism in children is lower for mothers who took prenatal vitamins.
+
+## Calculating test statistic ($z$ score)
+
+This is a different approach that would get us to the same 
+
+test statistic:
+
+```{r}
+test_statistic <- ((p_v - p_nv) - 0) / se
+test_statistic
+```
+critical value:
+
+```{r}
+critical_value <- qnorm(0.025)
+critical_value
+```
+
+
+Since the test statistic of `r test_statistic` is less than the `r critical_value`, in other words, since the test statistic is more extreme than the critical value, we reject the null hypothesis and conclude that there is a significant difference in autism rate of children born to mothers who take prenatal vitamins and those who do not. Considering that the point estimate is negative, we can conclude that the rate of autism in children is lower for mothers who took prenatal vitamins.
+
+## Conclusion
+
+**New York Times article reporting on this study was titled “Prenatal Vitamins May Ward Off Autism”.Do you find the title of this article to be appropriate? Explain your answer. Additionally, propose an
+alternative title.**
+
+This is an observational study and we CANNOT conclude that prenatal vitamins prevent autism. 
+Causal conclusions can possibly be made in randomized experiments. 
+There might be many confounding factors such as environment of the household, income, nutrition, etc. that can possibly explain rate of autism.
+
