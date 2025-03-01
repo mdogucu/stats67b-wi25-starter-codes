@@ -1,0 +1,156 @@
+---
+title: Multiple Linear Regression and Maximum Likelihood Estimation
+---
+
+# Multiple Linear Regression
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(tidyverse)
+library(patchwork)
+library(broom)
+library(modelr)
+```
+For this example, we explore the power of the log transformation, along with a downside.  
+We start by looking at air quality data from New York City, May to September 1973.  
+The response of interest here is the Ozone, so we also add the log transformation in the dataset.
+Our predictors will be solar.R, wind, and temp.  So the models we will look at are
+$$
+y_i = \beta_0 + \beta_1x_{1,i} + \beta_2x_{2,i} + \beta_3x_{2,i} + \epsilon,
+$$
+and 
+$$
+\log y_i = \beta_0 + \beta_1x_{1,i} + \beta_2x_{2,i} + \beta_3x_{2,i} + \epsilon.
+$$
+```{r}
+air_quility_df = airquality |>
+  as_tibble() |>
+  mutate(log_ozone = log(Ozone)) |>
+  na.omit()
+glimpse(air_quility_df)
+```
+
+When doing regression is it is always good to start by creating plots of our 
+predictors with the response.  This results in the following for the natural scale
+Ozone (first row) and log scale Ozone (second row).
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+solar_ozone_plot = ggplot(data = air_quility_df, aes(x = Solar.R, y = Ozone)) +
+  geom_point() +
+  theme_bw()
+wind_ozone_plot = ggplot(data = air_quility_df, aes(x = Wind, y = Ozone)) +
+  geom_point() +
+  theme_bw()
+temp_ozone_plot = ggplot(data = air_quility_df, aes(x = Temp, y = Ozone)) +
+  geom_point() +
+  theme_bw()
+solar_log_ozone_plot = ggplot(data = air_quility_df, aes(x = Solar.R, y = log_ozone)) +
+  geom_point() +
+  theme_bw()
+wind_log_ozone_plot = ggplot(data = air_quility_df, aes(x = Wind, y = log_ozone)) +
+  geom_point() +
+  theme_bw()
+temp_log_ozone_plot = ggplot(data = air_quility_df, aes(x = Temp, y = log_ozone)) +
+  geom_point() +
+  theme_bw()
+
+(solar_ozone_plot + wind_ozone_plot + temp_ozone_plot) /
+  (solar_log_ozone_plot + wind_log_ozone_plot + temp_log_ozone_plot)
+```
+
+### Question :
+What can you notice when be compare the log and natrual scaled Ozone plots?  Which 
+appears to be more linear?
+
+## Fitting MLR to Both :
+```{r}
+model_no_log = lm(Ozone ~ Solar.R + Wind + Temp, data = air_quility_df)
+model_log = lm(log_ozone ~ Solar.R + Wind + Temp, data = air_quility_df)
+```
+
+Lets look at what our estimates are for regression coefficients with corresponding
+p-values.
+
+```{r}
+tidy(model_no_log)
+tidy(model_log)
+```
+
+## Checking Conditions for Estimates
+1. Linearity
+2. Normality of residuals
+3. Constant Variance
+4. Independence
+
+### Question :
+Which conditions does the natural scale Ozone model violate?  Which conditions 
+does the log scale Ozone model violate?  *Use the plots below.*
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+residuals_no_log_df = tibble(
+  fitted_values = fitted.values(model_no_log),
+  residuals = residuals(model_no_log)
+)
+residuals_log_df = tibble(
+  fitted_values = fitted.values(model_log),
+  residuals = residuals(model_log)
+)
+res_dens_no_log_plot = ggplot(residuals_no_log_df, aes(x = residuals)) +
+  geom_density(color = "dodgerblue", fill = "dodgerblue", alpha = .1) +
+  labs(title = "Distribution of residuals",
+       subtitle = "for Model with Ozone on natrual scale.") +
+  theme_bw()
+res_dens_log_plot = ggplot(residuals_log_df, aes(x = residuals)) +
+  geom_density(color = "dodgerblue", fill = "dodgerblue", alpha = .1) +
+  labs(title = "Distribution of residuals",
+       subtitle = "for Model with Ozone on log scale.") +
+  theme_bw()
+res_no_log_plot = ggplot(residuals_no_log_df, aes(x = fitted_values, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "dodgerblue") +
+  labs(title = "Residuals vs Fitted Values", 
+       subtitle = "for Model with Ozone on natrual scale.") +
+  theme_bw()
+res_log_plot = ggplot(residuals_log_df, aes(x = fitted_values, y = residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "dodgerblue") +
+  labs(title = "Residuals vs Fitted Values", 
+       subtitle = "for Model with Ozone on log scale.") +
+  theme_bw()
+
+(res_dens_no_log_plot + res_dens_log_plot) /
+  (res_no_log_plot + res_log_plot)
+```
+
+## Interpretation
+When interpreting coefficients for a model, we must remember to convert transformed
+variables back into their original scale.  So, in the log scale, we need to use
+$$
+\hat{y_i} = \exp\left[ b_0 + b_1x_{1,i} + b_2x_{2,i} + b_3x_{2,i}\right]
+$$
+as a basis for interpreting coefficients.
+
+### Question 
+Give an interpretation for $b_3$ in both the natural scale and log scale models.
+
+# Maximum Likelihood Estimation (MLE)
+
+## Steps of MLE
+1. Find the log-likelihood function, $\log L(\theta; x_1,...,x_n)$.
+2. Take the derivative of the log-likelihood with respect to the parameter we are estimating, $\frac{d}{d\theta}\log L(\theta;x_1,...,x_n)$.
+3. Set derivative to zero and solve for parameter we are interested in estimating, $\frac{d}{d\theta}\log L(\theta;x_1,...,x_n) = 0$.
+4. Check the second derivative for concavity, we want a maximum, $\frac{d^2}{d\theta^2}\log L(\theta;x_1,...,x_n)$.
+
+## You Try!
+Suppose we have independent identically distributed random variables, $Y_i$, where $Y_i \sim \text{Normal}(x_i\beta, 1)$, where $x_i$'s are given for $i = 1,...,n$.  Show that the MLE of $\beta$ is 
+$\frac{\sum_{i=1}^{n}x_iY_i}{\sum_{i=1}^{n}x_i^2}$.  Recall that the pdf of this random variable is
+$$
+f(Y_i|x_i,\beta) = \frac{1}{\sqrt{2\pi}}\exp\left[\frac{(Y_i - x_i\beta)^2}{2}\right].
+$$
+
+
