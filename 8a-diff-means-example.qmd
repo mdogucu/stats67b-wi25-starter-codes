@@ -1,0 +1,51 @@
+---
+title: "7-28"
+format: html
+---
+
+## 95% Confidence Interval
+
+```{r}
+xbar1 <- 16.12
+xbar2 <- 19.85
+point_estimate <- xbar1-xbar2
+point_estimate
+```
+
+```{r}
+s1 <- 3.58
+s2 <- 4.51
+n1 <- 26
+n2 <- 26
+```
+
+
+```{r}
+critical_value <- qt(0.975, df = 25) 
+critical_value
+```
+
+```{r}
+se <- sqrt((s1^2)/n1 + (s2^2)/n2)
+se
+```
+
+```{r}
+point_estimate - critical_value*se
+point_estimate + critical_value*se
+```
+Looking at this interval with only negative values, I am confident that the average mpg for automatic cars is lower than manual cars.
+
+## Hypothesis Testing
+
+$$H_0:\mu_1 - \mu_2 = 0$$
+$$H_A:\mu_1 - \mu_2 \neq 0$$
+
+```{r}
+(point_estimate - 0) / se
+```
+
+```{r}
+pt((point_estimate - 0) / se, df = 25) *2 
+```
+The p-value of `r pt((point_estimate - 0) / se, df = 25) *2` is less than 0.05 we reject the null hypothesis and conclude that there is a significant difference between average mpg of automatic cars and manual cars. Considering that automatic cars have a lower mpg we can conclude also that automatic cars have significantly lower mpg than manual cars.
